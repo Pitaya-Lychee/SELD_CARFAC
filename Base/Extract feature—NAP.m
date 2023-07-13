@@ -2,49 +2,49 @@ clear all
 clc
 close all
 clear variables
-%------------------------ÊäÈëÓïÒôĞÅºÅ----------------------------------------
+%------------------------è¾“å…¥è¯­éŸ³ä¿¡å·----------------------------------------
 %---------------------------------------------------------------------------
 wav='test_0_desc_30_300.wav';
 [test_signal,fs]=audioread(wav);
 
-% Ö±½Ó¿¼ÂÇ¶ú¶äÊıÁ¿µÄÇé¿ö
+% ç›´æ¥è€ƒè™‘è€³æœµæ•°é‡çš„æƒ…å†µ
 n_ears = 1;
 %----------------------------------------------------------------------------
-%---------------------------³õÊ¼»¯CAR¡¢IHC¡¢AGC²ÎÊı---------------------------
+%---------------------------åˆå§‹åŒ–CARã€IHCã€AGCå‚æ•°---------------------------
 CF_CAR_params = struct( ...
-    'velocity_scale', 0.1, ...  % P254ÖĞµÄ·ÇÏßĞÔº¯ÊıËÙ¶Èscale
-    'v_offset', 0.04, ...  % P254ÖĞµÄoffset
-    'min_zeta', 0.10, ... % ×îĞ¡×èÄáÒò×Ó¦Æ
-    'max_zeta', 0.35, ... % ×î´ó×èÄáÒò×Ó¦Æ
-    'first_pole_theta', 0.85*pi, ... % µÚÒ»¸ö¼«µã½Ç¶ÈµÄ¦È
-    'zero_ratio', sqrt(2), ... % Áã¼«µã¾àÀë
-    'high_f_damping_compression', 0.5, ... % 0 to 1 to compress zeta ¸ßÆµ×èÄáÑ¹Ëõ
-    'ERB_per_step', 0.5, ... % assume G&M's ERB formula
+    'velocity_scale', 0.1, ...  % P254ä¸­çš„éçº¿æ€§å‡½æ•°é€Ÿåº¦scale
+    'v_offset', 0.04, ...  % P254ä¸­çš„offset
+    'min_zeta', 0.10, ... % æœ€å°é˜»å°¼å› å­Î¶
+    'max_zeta', 0.35, ... % æœ€å¤§é˜»å°¼å› å­Î¶
+    'first_pole_theta', 0.85*pi, ... % ç¬¬ä¸€ä¸ªæç‚¹è§’åº¦çš„Î¸
+    'zero_ratio', sqrt(2), ... % é›¶æç‚¹è·ç¦»
+    'high_f_damping_compression', 0.5, ... % 0 to 1 to compress zeta é«˜é¢‘é˜»å°¼å‹ç¼©
+    'ERB_per_step', 0.5, ... 
     'min_pole_Hz', 30, ...
-    'ERB_break_freq', 165.3, ...  % Greenwood map's break freq.
-    'ERB_Q', 1000/(24.7*4.37));  % Glasberg and Moore's high-cf ratio
+    'ERB_break_freq', 165.3, ...  
+    'ERB_Q', 1000/(24.7*4.37));  
 
 just_hwr=0;
 one_cap=1;
 CF_IHC_params = struct( ...
-    'just_hwr', just_hwr, ...        % not just a simple HWR
-    'one_cap', one_cap, ...   % bool; 0 for new two-cap hack
-    'tau_lpf', 0.000080, ...  % P266ÓÃÓÚË«¼«Æ½»¬ÂË²¨Æ÷
-    'tau_out', 0.0005, ...    % P266ÖĞµÚÒ»¸öµÍÍ¨ÂË²¨Æ÷µÄÊ±¼ä³£Êı£¬Í¨¹ı¼õÈ¥ÊäÈëĞÅºÅÒÔ¹¹³É¸ßÍ¨ÂË²¨Æ÷,ÓÃÓÚÒÖÖÆÔÚ»ùµ×Ä¤²¨´«²¥Æ½·½»û±äÊ±²úÉú20hzÒÔÏÂµÄÆµÂÊ
-    'tau_in', 0.010, ...      % P266ÓÃ×÷IHC×Ô¶¯ÔöÒæ¿ØÖÆµÄ»·Â·ÂË²¨Æ÷µÄÊ±¼ä³£Êı
-    'ac_corner_Hz', 20);  % ÒÖÖÆÔÚ»ùµ×Ä¤²¨´«²¥Æ½·½»û±äÊ±²úÉú20hzÒÔÏÂµÄÆµÂÊ
+    'just_hwr', just_hwr, ...        
+    'one_cap', one_cap, ...   
+    'tau_lpf', 0.000080, ...  % P266ç”¨äºåŒæå¹³æ»‘æ»¤æ³¢å™¨
+    'tau_out', 0.0005, ...    % P266ä¸­ç¬¬ä¸€ä¸ªä½é€šæ»¤æ³¢å™¨çš„æ—¶é—´å¸¸æ•°ï¼Œé€šè¿‡å‡å»è¾“å…¥ä¿¡å·ä»¥æ„æˆé«˜é€šæ»¤æ³¢å™¨,ç”¨äºæŠ‘åˆ¶åœ¨åŸºåº•è†œæ³¢ä¼ æ’­å¹³æ–¹ç•¸å˜æ—¶äº§ç”Ÿ20hzä»¥ä¸‹çš„é¢‘ç‡
+    'tau_in', 0.010, ...      % P266ç”¨ä½œIHCè‡ªåŠ¨å¢ç›Šæ§åˆ¶çš„ç¯è·¯æ»¤æ³¢å™¨çš„æ—¶é—´å¸¸æ•°
+    'ac_corner_Hz', 20);  % æŠ‘åˆ¶åœ¨åŸºåº•è†œæ³¢ä¼ æ’­å¹³æ–¹ç•¸å˜æ—¶äº§ç”Ÿ20hzä»¥ä¸‹çš„é¢‘ç‡
 
 CF_AGC_params = struct( ...
-    'n_stages', 4, ...  % P269¶¨Òå4½×µÄÆ½»¬ÂË²¨Æ÷
-    'time_constants', 0.002 * 4.^(0:3), ... % Ê±¼ä³£Á¿0.002,0.008,0.032,0.128
-    'AGC_stage_gain', 2, ...  % ÏÂÒ»¼¶¸üÂı¼¶µÄÊäÈëÈ¨ÖØ2
-    'decimation', [8, 2, 2, 2], ...  % AGC¸üĞÂÊ±¼äµã£¬µş³ËºóÎª[8,16,32,64]
-    'AGC1_scales', 1.0 * sqrt(2).^(0:3), ...   %  ÎÏµ×ÏòÎÏ¶¥Æ½»¬²ÎÊı
-    'AGC2_scales', 1.65 * sqrt(2).^(0:3), ... %  ÎÏ¶¥ÏòÎÏµ×Æ½»¬²ÎÊı
-    'AGC_mix_coeff', 0.5);  %×î´óÔöÒæÏµÊı
+    'n_stages', 4, ...  % P269å®šä¹‰4é˜¶çš„å¹³æ»‘æ»¤æ³¢å™¨
+    'time_constants', 0.002 * 4.^(0:3), ... % æ—¶é—´å¸¸é‡0.002,0.008,0.032,0.128
+    'AGC_stage_gain', 2, ...  % ä¸‹ä¸€çº§æ›´æ…¢çº§çš„è¾“å…¥æƒé‡2
+    'decimation', [8, 2, 2, 2], ...  % AGCæ›´æ–°æ—¶é—´ç‚¹ï¼Œå ä¹˜åä¸º[8,16,32,64]
+    'AGC1_scales', 1.0 * sqrt(2).^(0:3), ...   %  èœ—åº•å‘èœ—é¡¶å¹³æ»‘å‚æ•°
+    'AGC2_scales', 1.65 * sqrt(2).^(0:3), ... %  èœ—é¡¶å‘èœ—åº•å¹³æ»‘å‚æ•°
+    'AGC_mix_coeff', 0.5);  %æœ€å¤§å¢ç›Šç³»æ•°
 %----------------------------------------------------------------------------
-%-------------------------ÇóÍ¨µÀÊıÒÔ¼°¶ÔÓ¦µÄÖĞĞÄÆµÂÊ---------------------------
-pole_Hz = CF_CAR_params.first_pole_theta * fs / (2*pi);  % Í¨¹ıµÚÒ»¼«µãµÄ½Ç¶È¦ÈÇóµÃ¼«µãµÄÆµÂÊ
+%-------------------------æ±‚é€šé“æ•°ä»¥åŠå¯¹åº”çš„ä¸­å¿ƒé¢‘ç‡---------------------------
+pole_Hz = CF_CAR_params.first_pole_theta * fs / (2*pi);  % é€šè¿‡ç¬¬ä¸€æç‚¹çš„è§’åº¦Î¸æ±‚å¾—æç‚¹çš„é¢‘ç‡
 n_ch = 0;
 while pole_Hz > CF_CAR_params.min_pole_Hz
   n_ch = n_ch + 1;
@@ -52,9 +52,9 @@ while pole_Hz > CF_CAR_params.min_pole_Hz
     (CF_CAR_params.ERB_break_freq + pole_Hz) / CF_CAR_params.ERB_Q;
 end
 % ERB=24.7*(1+4.37*pole_Hz/1000),ERB_per_step=0.5,ERB_break_freq=165.3,ERB_Q=1000/(24.7*4.37)
-% ÇóµÃÍ¨µÀÊın_ch=71
+% æ±‚å¾—é€šé“æ•°n_ch=71
 
-% ÇóÃ¿¸öÍ¨µÀµÄÖĞĞÄÆµÂÊpole_freqs´Ó´óµ½Ğ¡ÅÅĞòµÄ:(71,1)
+% æ±‚æ¯ä¸ªé€šé“çš„ä¸­å¿ƒé¢‘ç‡pole_freqsä»å¤§åˆ°å°æ’åºçš„:(71,1)
 pole_freqs = zeros(n_ch, 1);
 pole_Hz = CF_CAR_params.first_pole_theta * fs / (2*pi);
 for ch = 1:n_ch
@@ -62,62 +62,62 @@ for ch = 1:n_ch
   pole_Hz = pole_Hz - CF_CAR_params.ERB_per_step * ...
     (CF_CAR_params.ERB_break_freq + pole_Hz) / CF_CAR_params.ERB_Q;
 end
-max_channels_per_octave = log(2) / log(pole_freqs(1)/pole_freqs(2));% Çó×î´óÆµµÀ°Ë¶È:12.2709
+max_channels_per_octave = log(2) / log(pole_freqs(1)/pole_freqs(2));% æ±‚æœ€å¤§é¢‘é“å…«åº¦:12.2709
 %----------------------------------------------------------------------------
 %-----------------------------CAR_coeffs-------------------------------------
 CAR_coeffs = struct( ...
   'n_ch', n_ch, ...   % 71
-  'velocity_scale', CF_CAR_params.velocity_scale, ...  % P254 ÇóNLFÖĞµÄscale=0.1
-  'v_offset', CF_CAR_params.v_offset ...   % P254 ÇóNLFÖĞµÄoffset=0.04
+  'velocity_scale', CF_CAR_params.velocity_scale, ...  % P254 æ±‚NLFä¸­çš„scale=0.1
+  'v_offset', CF_CAR_params.v_offset ...   % P254 æ±‚NLFä¸­çš„offset=0.04
   );
-CAR_coeffs.r1_coeffs = zeros(n_ch, 1); % ¼«µã°ë¾¶£¬Óë×èÄáÒò×ÓÓĞ¹Ø
-CAR_coeffs.a0_coeffs = zeros(n_ch, 1);%  a0Îª¼«µã½ÇµÄÓàÏÒ
-CAR_coeffs.c0_coeffs = zeros(n_ch, 1); % c0Îª¼«µã½ÇµÄÕıÏÒ
-CAR_coeffs.h_coeffs = zeros(n_ch, 1);  % hÓÃÓÚ¿ØÖÆÁãµãÓë¼«µãµÄÆµÂÊ±ÈÂÊ
-CAR_coeffs.g0_coeffs = zeros(n_ch, 1); % gÓÃÓÚµ÷Õû×ÜÔöÒæ
+CAR_coeffs.r1_coeffs = zeros(n_ch, 1); % æç‚¹åŠå¾„ï¼Œä¸é˜»å°¼å› å­æœ‰å…³
+CAR_coeffs.a0_coeffs = zeros(n_ch, 1);%  a0ä¸ºæç‚¹è§’çš„ä½™å¼¦
+CAR_coeffs.c0_coeffs = zeros(n_ch, 1); % c0ä¸ºæç‚¹è§’çš„æ­£å¼¦
+CAR_coeffs.h_coeffs = zeros(n_ch, 1);  % hç”¨äºæ§åˆ¶é›¶ç‚¹ä¸æç‚¹çš„é¢‘ç‡æ¯”ç‡
+CAR_coeffs.g0_coeffs = zeros(n_ch, 1); % gç”¨äºè°ƒæ•´æ€»å¢ç›Š
 f = CF_CAR_params.zero_ratio^2 - 1; 
-% zero_ratio±íÊ¾ÎªÁã¼«µã¾àÀësqrt(2),fµÄÄ¿µÄÊÇÎªÁËÇó³öhÖµ£¬¼´h=c0*f
-% P245,µ±ÁãµãÆµÂÊ½«±È¼«µãÆµÂÊ¸ß³ö´óÔ¼°ë¸ö±¶Æµ³ÌÊ±£¬f=1£¬h=c0
+% zero_ratioè¡¨ç¤ºä¸ºé›¶æç‚¹è·ç¦»sqrt(2),fçš„ç›®çš„æ˜¯ä¸ºäº†æ±‚å‡ºhå€¼ï¼Œå³h=c0*f
+% P245,å½“é›¶ç‚¹é¢‘ç‡å°†æ¯”æç‚¹é¢‘ç‡é«˜å‡ºå¤§çº¦åŠä¸ªå€é¢‘ç¨‹æ—¶ï¼Œf=1ï¼Œh=c0
 theta = pole_freqs .* (2 * pi / fs);
 x = theta/pi; 
-% ÇóµÃÃ¿¸öÖĞĞÄÆµÂÊËù¶ÔÓ¦µÄ¼«µã½Ç¶Ètheta=¦È£¬²¢½«Æä×ª»»Îª»¡¶Èx=w
-c0 = sin(theta); % c0Îª¼«µã½ÇµÄÕıÏÒ
-a0 = cos(theta); % a0Îª¼«µã½ÇµÄÓàÏÒ
-ff = CF_CAR_params.high_f_damping_compression; % ¿ÉÉèÖÃÎª0 to 1£¬´Ë´¦¶¨µÄ0.5£¨¸ßÆµ×èÄáÑ¹Ëõ£©
+% æ±‚å¾—æ¯ä¸ªä¸­å¿ƒé¢‘ç‡æ‰€å¯¹åº”çš„æç‚¹è§’åº¦theta=Î¸ï¼Œå¹¶å°†å…¶è½¬æ¢ä¸ºå¼§åº¦x=w
+c0 = sin(theta); % c0ä¸ºæç‚¹è§’çš„æ­£å¼¦
+a0 = cos(theta); % a0ä¸ºæç‚¹è§’çš„ä½™å¼¦
+ff = CF_CAR_params.high_f_damping_compression; % å¯è®¾ç½®ä¸º0 to 1ï¼Œæ­¤å¤„å®šçš„0.5ï¼ˆé«˜é¢‘é˜»å°¼å‹ç¼©ï¼‰
 zr_coeffs = pi * (x - ff * x.^3); 
 % when ff is 0, this is just theta, and when ff is 1 it goes to zero at theta = pi.
 max_zeta = CF_CAR_params.max_zeta;   
-% 'max_zeta', 0.35, ×î´ó×èÄáÒò×Ó¦Æ
+% 'max_zeta', 0.35, æœ€å¤§é˜»å°¼å› å­Î¶
 CAR_coeffs.r1_coeffs = (1 - zr_coeffs .* max_zeta);  
-% r1ÊÇÔÚ×î´ó×èÄáÌõ¼şÏÂµÄ°ë¾¶
+% r1æ˜¯åœ¨æœ€å¤§é˜»å°¼æ¡ä»¶ä¸‹çš„åŠå¾„
 min_zeta = CF_CAR_params.min_zeta;
-% 'min_zeta', 0.10£¬×îĞ¡×èÄáÒò×Ó¦Æ
+% 'min_zeta', 0.10ï¼Œæœ€å°é˜»å°¼å› å­Î¶
 min_zetas = min_zeta + 0.25* ...
   (((CF_CAR_params.ERB_break_freq + pole_Hz) / CF_CAR_params.ERB_Q)./ pole_freqs - min_zeta);
-% ¸ù¾İµÈĞ§¾ØÕó´ø¿íÇó³öÍ¨µÀ¼ä¾à¼ä¸ü¶àµÄ×îĞ¡×èÄá
+% æ ¹æ®ç­‰æ•ˆçŸ©é˜µå¸¦å®½æ±‚å‡ºé€šé“é—´è·é—´æ›´å¤šçš„æœ€å°é˜»å°¼
 CAR_coeffs.zr_coeffs = zr_coeffs .* ...
   (max_zeta - min_zetas);
-% ÇóµÃÏà¶Ô¸º×èÄádrz
+% æ±‚å¾—ç›¸å¯¹è´Ÿé˜»å°¼drz
 CAR_coeffs.a0_coeffs = a0;
 CAR_coeffs.c0_coeffs = c0;
 h = c0 .* f;  
 CAR_coeffs.h_coeffs = h;
-relative_undamping = ones(n_ch, 1);  % ´Ë´¦ÒòÎªÎ´ÒıÈëAGCµ¥Ôª£¬¼ÙÉèb=0£¬¹Êr=r1+drz*(1-b)ÖĞµÄ(1-b)ÁîÎª1
+relative_undamping = ones(n_ch, 1);  % æ­¤å¤„å› ä¸ºæœªå¼•å…¥AGCå•å…ƒï¼Œå‡è®¾b=0ï¼Œæ•…r=r1+drz*(1-b)ä¸­çš„(1-b)ä»¤ä¸º1
 % CAR_coeffs.g0_coeffs = CARFAC_Stage_g(CAR_coeffs, relative_undamping);
-r1 = CAR_coeffs.r1_coeffs;  % r1ÊÇÔÚ×î´ó×èÄáÌõ¼şÏÂµÄ°ë¾¶
+r1 = CAR_coeffs.r1_coeffs;  % r1æ˜¯åœ¨æœ€å¤§é˜»å°¼æ¡ä»¶ä¸‹çš„åŠå¾„
 a0 = CAR_coeffs.a0_coeffs;  
 c0 = CAR_coeffs.c0_coeffs;
-h  = CAR_coeffs.h_coeffs;  % hÓÃÓÚ¿ØÖÆÁãµãÓë¼«µãµÄÆµÂÊ±ÈÂÊ
-zr = CAR_coeffs.zr_coeffs;  %drz Ïà¶Ô¸º×èÄá
+h  = CAR_coeffs.h_coeffs;  % hç”¨äºæ§åˆ¶é›¶ç‚¹ä¸æç‚¹çš„é¢‘ç‡æ¯”ç‡
+zr = CAR_coeffs.zr_coeffs;  %drz ç›¸å¯¹è´Ÿé˜»å°¼
 r  = r1 + zr .* relative_undamping;  % r=r1+drz*(1-b)
-g  = (1 - 2*r.*a0 + r.^2) ./ (1 - 2*r.*a0 + h.*r.*c0 + r.^2); % ¸ù¾İP246ÇógµÄ¹«Ê½µÃ³ö
+g  = (1 - 2*r.*a0 + r.^2) ./ (1 - 2*r.*a0 + h.*r.*c0 + r.^2); % æ ¹æ®P246æ±‚gçš„å…¬å¼å¾—å‡º
 
 % AGC_coeffs = CARFAC_DesignAGC(AGC_params, fs, n_ch)
 %----------------------------------------------------------------------------
 %-----------------------------AGC_coeffs-------------------------------------
-n_AGC_stages = CF_AGC_params.n_stages; % Æ½»¬ÂË²¨Æ÷½×Êı4
-% 'AGC1_scales', 1.0 * sqrt(2).^(0:3), ...   % AGC1Í¨µÀ´ÓÎÏµ×ÏòÎÏ¶¥Æ½»¬
-% 'AGC2_scales', 1.65 * sqrt(2).^(0:3), ...  % AGC2Í¨µÀ´ÓÎÏ¶¥ÏòÎÏµ×Æ½»¬
+n_AGC_stages = CF_AGC_params.n_stages; % å¹³æ»‘æ»¤æ³¢å™¨é˜¶æ•°4
+% 'AGC1_scales', 1.0 * sqrt(2).^(0:3), ...   % AGC1é€šé“ä»èœ—åº•å‘èœ—é¡¶å¹³æ»‘
+% 'AGC2_scales', 1.65 * sqrt(2).^(0:3), ...  % AGC2é€šé“ä»èœ—é¡¶å‘èœ—åº•å¹³æ»‘
 AGC1_scales = CF_AGC_params.AGC1_scales;
 AGC2_scales = CF_AGC_params.AGC2_scales;
 decim = 1;
@@ -127,24 +127,24 @@ for stage = 1:n_AGC_stages
   AGC_coeffs(stage).n_ch = n_ch;
   AGC_coeffs(stage).n_AGC_stages = n_AGC_stages;
   AGC_coeffs(stage).AGC_stage_gain = CF_AGC_params.AGC_stage_gain;
-  % 'time_constants', 0.002 * 4.^(0:3), ... % Ê±¼ä³£Á¿0.002,0.008,0.032,0.128
-  % 'AGC_stage_gain', 2, ...  % ÏÂÒ»¼¶¸üÂı¼¶µÄÊäÈëÈ¨ÖØ2
-  % 'decimation', [8, 2, 2, 2], ...  % ¸ù¾İµş³Ë¸üĞÂÊ±¼äµãÎª[8,16,32,64]
-  % 'AGC1_scales', 1.0 * sqrt(2).^(0:3)  AGC1Í¨µÀ´ÓÎÏµ×ÏòÎÏ¶¥Æ½»¬
-  % 'AGC2_scales', 1.65 * sqrt(2).^(0:3) AGC2Í¨µÀ´ÓÎÏ¶¥ÏòÎÏµ×Æ½»¬
+  % 'time_constants', 0.002 * 4.^(0:3), ... % æ—¶é—´å¸¸é‡0.002,0.008,0.032,0.128
+  % 'AGC_stage_gain', 2, ...  % ä¸‹ä¸€çº§æ›´æ…¢çº§çš„è¾“å…¥æƒé‡2
+  % 'decimation', [8, 2, 2, 2], ...  % æ ¹æ®å ä¹˜æ›´æ–°æ—¶é—´ç‚¹ä¸º[8,16,32,64]
+  % 'AGC1_scales', 1.0 * sqrt(2).^(0:3)  AGC1é€šé“ä»èœ—åº•å‘èœ—é¡¶å¹³æ»‘
+  % 'AGC2_scales', 1.65 * sqrt(2).^(0:3) AGC2é€šé“ä»èœ—é¡¶å‘èœ—åº•å¹³æ»‘
   AGC_coeffs(stage).decimation = CF_AGC_params.decimation(stage);
-  tau = CF_AGC_params.time_constants(stage);  % Ê±¼ä³£Á¿(s)
-  decim = decim * CF_AGC_params.decimation(stage);  % ¸üĞÂÊ±¼äµã£¬»á¸ù¾İ½×ÊıÀÛ³Ë [8,16,32,64]
-  % AGC_epsilon±íÊ¾Ã¿Ò»²½¸üĞÂĞèÒª¶àÉÙĞÂÊäÈë£¬Àí½â£º¸ù¾İ¸üĞÂÊ±¼äµã¡¢Ê±¼ä³£ÊıÓë²ÉÑùÂÊËã³öĞèÒª°ÑÇ°ºó¶à³¤Ê±¼äµÄÊäÈëÓÃÀ´Æ½»¬
+  tau = CF_AGC_params.time_constants(stage);  % æ—¶é—´å¸¸é‡(s)
+  decim = decim * CF_AGC_params.decimation(stage);  % æ›´æ–°æ—¶é—´ç‚¹ï¼Œä¼šæ ¹æ®é˜¶æ•°ç´¯ä¹˜ [8,16,32,64]
+  % AGC_epsilonè¡¨ç¤ºæ¯ä¸€æ­¥æ›´æ–°éœ€è¦å¤šå°‘æ–°è¾“å…¥ï¼Œç†è§£ï¼šæ ¹æ®æ›´æ–°æ—¶é—´ç‚¹ã€æ—¶é—´å¸¸æ•°ä¸é‡‡æ ·ç‡ç®—å‡ºéœ€è¦æŠŠå‰åå¤šé•¿æ—¶é—´çš„è¾“å…¥ç”¨æ¥å¹³æ»‘
   AGC_coeffs(stage).AGC_epsilon = 1 - exp(-decim / (tau * fs)); 
-  % Ò»¸öÊ±¼ä³£ÊıÖĞÆ½»¬µÄÓĞĞ§´ÎÊı:
-  %£¨ÔÚÃ¿¸öAGC¸üĞÂÊ±¼äµã×÷ÓÃÓÚAGCµÍÍ¨ÂË²¨Æ÷×´Ì¬ÊıÁĞ£¬²¢ÀûÓÃÊ±¼äÆ½»¬µÄ³¤Ê±³£Êı½øĞĞ¶à´ÎÓĞĞ§µü´ú£©
+  % ä¸€ä¸ªæ—¶é—´å¸¸æ•°ä¸­å¹³æ»‘çš„æœ‰æ•ˆæ¬¡æ•°:
+  %ï¼ˆåœ¨æ¯ä¸ªAGCæ›´æ–°æ—¶é—´ç‚¹ä½œç”¨äºAGCä½é€šæ»¤æ³¢å™¨çŠ¶æ€æ•°åˆ—ï¼Œå¹¶åˆ©ç”¨æ—¶é—´å¹³æ»‘çš„é•¿æ—¶å¸¸æ•°è¿›è¡Œå¤šæ¬¡æœ‰æ•ˆè¿­ä»£ï¼‰
   ntimes = tau * (fs / decim);  % decim[8,16,32,64]
 
-  % È·¶¨Âö³åÏìÓ¦µÄÄ¿±êÀ©É¢(·½²î)ºÍÑÓ³Ù(¾ùÖµ)×÷ÎªÒª¾í»ın´ÎµÄ·Ö²¼£º
+  % ç¡®å®šè„‰å†²å“åº”çš„ç›®æ ‡æ‰©æ•£(æ–¹å·®)å’Œå»¶è¿Ÿ(å‡å€¼)ä½œä¸ºè¦å·ç§¯næ¬¡çš„åˆ†å¸ƒï¼š
   delay = (AGC2_scales(stage) - AGC1_scales(stage)) / ntimes; 
   spread_sq = (AGC1_scales(stage)^2 + AGC2_scales(stage)^2) / ntimes; 
-  % »ñµÃ¼«µãÎ»ÖÃ£¬ÒÔ¸üºÃµØÆ¥ÅäÃ¿¸ö·½ÏòÉÏ[[¼¸ºÎ·Ö²¼]]µÄÔ¤ÆÚÀ©Õ¹ºÍÑÓ³Ù
+  % è·å¾—æç‚¹ä½ç½®ï¼Œä»¥æ›´å¥½åœ°åŒ¹é…æ¯ä¸ªæ–¹å‘ä¸Š[[å‡ ä½•åˆ†å¸ƒ]]çš„é¢„æœŸæ‰©å±•å’Œå»¶è¿Ÿ
   u = 1 + 1 / spread_sq;  
   p = u - sqrt(u^2 - 1);   
   dp = delay * (1 - 2*p +p^2)/2;
@@ -165,10 +165,10 @@ for stage = 1:n_AGC_stages
   while ~done
     switch n_taps
       case 0
-        % 3µãFIR:
+        % 3ç‚¹FIR:
         n_taps = 3;
       case 3
-        % 5µãFIR
+        % 5ç‚¹FIR
         n_taps = 5;
       case 5
         % apply FIR multiple times instead of going wider:
@@ -182,47 +182,42 @@ for stage = 1:n_AGC_stages
         error('Bad n_taps in CARFAC_DesignAGC');
     end
     % [AGC_spatial_FIR, done] = Design_FIR_coeffs(n_taps, spread_sq, delay, n_iterations);
-    % »ñµÃ×óÓÒÍ¨µÀ´¦µÄÈ¨ÖØ£¬·µ»ØÖµÎªAGC_spatial_FIR=[CL,1-CL-CR,CR]
-    % Í¨¹ın´Îµü´ú¼õĞ¡Æ½»¬·Ö²¼µÄ¾ùÖµºÍ·½²î:
+    % è·å¾—å·¦å³é€šé“å¤„çš„æƒé‡ï¼Œè¿”å›å€¼ä¸ºAGC_spatial_FIR=[CL,1-CL-CR,CR]
+    % é€šè¿‡næ¬¡è¿­ä»£å‡å°å¹³æ»‘åˆ†å¸ƒçš„å‡å€¼å’Œæ–¹å·®:
     mean_delay = delay / n_iterations;
     delay_variance = spread_sq / n_iterations;
     switch n_taps
       case 3
-        % based on solving to match mean and variance of [a, 1-a-b, b]:
         a = (delay_variance + mean_delay*mean_delay - mean_delay) / 2;
         b = (delay_variance + mean_delay*mean_delay + mean_delay) / 2;
         AGC_spatial_FIR = [a, 1 - a - b, b];
         done = AGC_spatial_FIR(2) >= 0.25;
       case 5
-        % based on solving to match [a/2, a/2, 1-a-b, b/2, b/2]:
         a = ((delay_variance + mean_delay*mean_delay)*2/5 - mean_delay*2/3) / 2;
         b = ((delay_variance + mean_delay*mean_delay)*2/5 + mean_delay*2/3) / 2;
-        % first and last coeffs are implicitly duplicated to make 5-point FIR:
         AGC_spatial_FIR = [a/2, 1 - a - b, b/2];
         done = AGC_spatial_FIR(2) >= 0.15;
       otherwise
         error('Bad n_taps in AGC_spatial_FIR');
     end   
   end
-  % When done, store the resulting FIR design in coeffs:
-  AGC_coeffs(stage).AGC_spatial_iterations = n_iterations; % ¿Õ¼äµü´ú´ÎÊı
-  AGC_coeffs(stage).AGC_spatial_FIR = AGC_spatial_FIR;% »ñµÃÈı²àÈ¨ÖØ
-  AGC_coeffs(stage).AGC_spatial_n_taps = n_taps; % n_tapsµãFIRÂË²¨Æ÷
+  AGC_coeffs(stage).AGC_spatial_iterations = n_iterations; % ç©ºé—´è¿­ä»£æ¬¡æ•°
+  AGC_coeffs(stage).AGC_spatial_FIR = AGC_spatial_FIR;% è·å¾—ä¸‰ä¾§æƒé‡
+  AGC_coeffs(stage).AGC_spatial_n_taps = n_taps; % n_tapsç‚¹FIRæ»¤æ³¢å™¨
 
-  % accumulate DC gains from all the stages, accounting for stage_gain:
-  % ÀÛ»ıËùÓĞ½×¶ÎµÄÖ±Á÷ÔöÒæ£¬Õ¼½×¶ÎÔöÒæ£º
+  % ç´¯ç§¯æ‰€æœ‰é˜¶æ®µçš„ç›´æµå¢ç›Šï¼Œå é˜¶æ®µå¢ç›Šï¼š
   total_DC_gain = total_DC_gain + CF_AGC_params.AGC_stage_gain^(stage-1);
 
-  % TODO (dicklyon) -- is this the best binaural mixing plan?
+
   if stage == 1
     AGC_coeffs(stage).AGC_mix_coeffs = 0;
   else
     AGC_coeffs(stage).AGC_mix_coeffs = CF_AGC_params.AGC_mix_coeff / ...
-      (tau * (fs / decim));  % tau * (fs / decim)=ntimes Ò»¸öÊ±¼ä³£ÊıÖĞÆ½»¬µÄÓĞĞ§´ÎÊı
+      (tau * (fs / decim));  % tau * (fs / decim)=ntimes ä¸€ä¸ªæ—¶é—´å¸¸æ•°ä¸­å¹³æ»‘çš„æœ‰æ•ˆæ¬¡æ•°
   end
 end
 
-% ½«µÚ1¼¶detect_scaleµ÷ÕûÎªAGCÂË²¨Æ÷Ö±Á÷ÔöÒæµÄµ¹Êı£º
+% å°†ç¬¬1çº§detect_scaleè°ƒæ•´ä¸ºAGCæ»¤æ³¢å™¨ç›´æµå¢ç›Šçš„å€’æ•°ï¼š
 AGC_coeffs(1).detect_scale = 1 / total_DC_gain;
 
 % IHC_coeffs = CARFAC_DesignIHC(IHC_params, fs, n_ch)
@@ -235,13 +230,13 @@ zz1 = x_in1(set1)+a;
 conductance1 = zeros(size(x_in1));
 conductance1(set1) = zz1.^3 ./ (zz1.^3 + zz1.^2 + 0.1);  
 ro = 1 / conductance1;  
-% CARFAC_Detectº¯ÊıÊÇ½«P266Í¼18-7ÖĞµÄgËã³öÀ´ 
+% CARFAC_Detectå‡½æ•°æ˜¯å°†P266å›¾18-7ä¸­çš„gç®—å‡ºæ¥ 
 % ro = 1/CARFAC_Detect(10);
-c = CF_IHC_params.tau_out / ro; % tau_outÎª0.5msµÄ·Åµç£¨Êä³ö£©Ê±¼ä³£Êı 
-ri = CF_IHC_params.tau_in / c;  % tau_inÎª10ms´æ´¢³äµç£¨ÊäÈë£©Ê±¼ä³£Êı£¬Îª×Ô¶¯ÔöÒæ¿ØÖÆÖĞLPFÊ±¼ä³£Êı
-saturation_output = 1 / (2*ro + ri); % ±¥ºÍÏÂµÄÊä³ö
+c = CF_IHC_params.tau_out / ro; % tau_outä¸º0.5msçš„æ”¾ç”µï¼ˆè¾“å‡ºï¼‰æ—¶é—´å¸¸æ•° 
+ri = CF_IHC_params.tau_in / c;  % tau_inä¸º10mså­˜å‚¨å……ç”µï¼ˆè¾“å…¥ï¼‰æ—¶é—´å¸¸æ•°ï¼Œä¸ºè‡ªåŠ¨å¢ç›Šæ§åˆ¶ä¸­LPFæ—¶é—´å¸¸æ•°
+saturation_output = 1 / (2*ro + ri); % é¥±å’Œä¸‹çš„è¾“å‡º
 
-% ÔÙ¿¼ÂÇÃ»ÓĞĞÅºÅÊäÈëÊ±Êı×ÖIHCÄ£ĞÍµÄÆ½ºâ:
+% å†è€ƒè™‘æ²¡æœ‰ä¿¡å·è¾“å…¥æ—¶æ•°å­—IHCæ¨¡å‹çš„å¹³è¡¡:
 x_in2=0;
 set2 = x_in2 > -a;
 zz2 = x_in2(set2)+a;
@@ -249,8 +244,8 @@ conductance2 = zeros(size(x_in2));
 conductance2(set2) = zz2.^3 ./ (zz2.^3 + zz2.^2 + 0.1);  
 r0 = 1 / conductance2; 
 % r0 = 1/CARFAC_Detect(0);
-current = 1 / (ri + r0);  % Ö±Á÷q
-cap_voltage = 1 - current * ri;  % ÉÏÏŞµçÑ¹v
+current = 1 / (ri + r0);  % ç›´æµq
+cap_voltage = 1 - current * ri;  % ä¸Šé™ç”µå‹v
 IHC_coeffs = struct( ...
   'n_ch', n_ch, ...
   'just_hwr', 0, ...
@@ -258,10 +253,10 @@ IHC_coeffs = struct( ...
   'out_rate', ro / (CF_IHC_params.tau_out * fs), ...
   'in_rate', 1 / (CF_IHC_params.tau_in * fs), ...
   'one_cap', CF_IHC_params.one_cap, ...
-  'output_gain', 1/ (saturation_output - current), ... % ¹éÒ»»¯
+  'output_gain', 1/ (saturation_output - current), ... % å½’ä¸€åŒ–
   'rest_output', current / (saturation_output - current), ...
   'rest_cap', cap_voltage);
-% ²âÊÔ/ÑéÖ¤µÄµ¥Í¨µÀ×´Ì¬:
+% æµ‹è¯•/éªŒè¯çš„å•é€šé“çŠ¶æ€:
 IHC_state = struct( ...
   'cap_voltage', IHC_coeffs.rest_cap, ...
   'lpf1_state', 0, ...
@@ -270,7 +265,7 @@ IHC_state = struct( ...
 IHC_coeffs.ac_coeff = 2 * pi * CF_IHC_params.ac_corner_Hz / fs;
 
 %-----------------------------------------------------------------------------
-%----------------´´½¨CF½á¹¹Ìå½«ÉÏ±ßËùµÃµ½µÄ½á¹¹ÌåºÍ²ÎÊı´æÈë½øÈ¥------------------
+%----------------åˆ›å»ºCFç»“æ„ä½“å°†ä¸Šè¾¹æ‰€å¾—åˆ°çš„ç»“æ„ä½“å’Œå‚æ•°å­˜å…¥è¿›å»------------------
 for ear = 1:n_ears
   ears(ear).CAR_coeffs = CAR_coeffs;
   ears(ear).AGC_coeffs = AGC_coeffs;
@@ -289,7 +284,7 @@ CF = struct( ...
   'n_ears', n_ears );
 
 %----------------------------------------------------------------------------------
-%---------------³õÊ¼»¯¸÷²¿¼şÔËĞĞµÄÁÙÊ±×´Ì¬²ÎÊı  CF = CARFAC_Init(CF);----------------
+%---------------åˆå§‹åŒ–å„éƒ¨ä»¶è¿è¡Œçš„ä¸´æ—¶çŠ¶æ€å‚æ•°  CF = CARFAC_Init(CF);----------------
 for ear = 1:n_ears
     n_ch = CF.ears(ear).CAR_coeffs.n_ch;
     CF.ears(ear).CAR_state = struct(...
@@ -299,11 +294,11 @@ for ear = 1:n_ears
       'zB_memory', CF.ears(ear).CAR_coeffs.zr_coeffs, ...% dzr:CAR_coeffs.zr_coeffs = zr_coeffs .*(max_zeta - min_zetas);
       'dzB_memory', zeros(n_ch, 1), ...
       'zY_memory', zeros(n_ch, 1), ...
-      'g_memory', CF.ears(ear).CAR_coeffs.g0_coeffs, ...% p251Í¼17-1ÖĞµÄÔöÒæg
+      'g_memory', CF.ears(ear).CAR_coeffs.g0_coeffs, ...% p251å›¾17-1ä¸­çš„å¢ç›Šg
       'dg_memory', zeros(n_ch, 1) ...
       );
-    % CAR_Init_Stateºó»¹ÁôÓĞz1_memory£¬z2_memory£¬zA_memory£¬zB_memory£¨·Ç0£©£¬dzB_memory
-    % zY_memory£¬g_memory£¨·Ç0£©£¬dg_memory
+    % CAR_Init_Stateåè¿˜ç•™æœ‰z1_memoryï¼Œz2_memoryï¼ŒzA_memoryï¼ŒzB_memoryï¼ˆé0ï¼‰ï¼ŒdzB_memory
+    % zY_memoryï¼Œg_memoryï¼ˆé0ï¼‰ï¼Œdg_memory
 
     n_ch = CF.ears(ear).IHC_coeffs.n_ch;
     CF.ears(ear).IHC_state = struct(...
@@ -314,8 +309,8 @@ for ear = 1:n_ears
       'ac_coupler', zeros(n_ch, 1) ...
       );
 
-     n_ch = CF.ears(ear).AGC_coeffs(1).n_ch; % È¡Í¨µÀÊı
-     n_AGC_stages = CF.ears(ear).AGC_coeffs.n_AGC_stages;% È¡Æ½»¬ÂË²¨Æ÷µÄ½×Êı
+     n_ch = CF.ears(ear).AGC_coeffs(1).n_ch; % å–é€šé“æ•°
+     n_AGC_stages = CF.ears(ear).AGC_coeffs.n_AGC_stages;% å–å¹³æ»‘æ»¤æ³¢å™¨çš„é˜¶æ•°
      CF.ears(ear).AGC_state = struct([]);
     for stage = 1:n_AGC_stages
          CF.ears(ear).AGC_state(stage).AGC_memory = zeros(n_ch, 1);
@@ -323,11 +318,11 @@ for ear = 1:n_ears
          CF.ears(ear).AGC_state(stage).decim_phase = 0;  % integer decimator phase
     end
   % CF.ears(ear).IHC_coeffs
-  % IHC_Init_Stateºó»¹ÁôÓĞihc_accum£¬cap_voltage£¨·Ç0£©£¬lpf1_state£¨·Ç0£©£¬lpf2_state£¨·Ç0£©£¬ac_coupler
-  % AGC_Init_Stateºó»¹ÁôÓĞÃ¿¼¶Æ½»¬ÂË²¨Æ÷µÄAGC_memory£¬input_accum£¬decim_phase=0
+  % IHC_Init_Stateåè¿˜ç•™æœ‰ihc_accumï¼Œcap_voltageï¼ˆé0ï¼‰ï¼Œlpf1_stateï¼ˆé0ï¼‰ï¼Œlpf2_stateï¼ˆé0ï¼‰ï¼Œac_coupler
+  % AGC_Init_Stateåè¿˜ç•™æœ‰æ¯çº§å¹³æ»‘æ»¤æ³¢å™¨çš„AGC_memoryï¼Œinput_accumï¼Œdecim_phase=0
 end
 %----------------------------------------------------------------------------------
-%-------------------------------------ÇóÖ¡Êı---------------------------------------
+%-------------------------------------æ±‚å¸§æ•°---------------------------------------
 % agc_plot_fig_num = 10;
 %[CF_struct, nap_decim, nap, BM, ohc, agc] = CARFAC_Run(CF_struct, test_signal,agc_plot_fig_num);
 [n_samp,n_ears] = size(test_signal);
@@ -336,7 +331,7 @@ BM = zeros(n_samp,n_ch,n_ears);
 ohc = zeros(n_samp,n_ch,n_ears);
 agc = zeros(n_samp,n_ch,n_ears);
 nap = zeros(n_samp,n_ch,n_ears);
-seglen = 256; % ÉèÖ¡³¤Îª160   882¡ú20msÒ»Ö¡(fs=44100) 882*
+seglen = 256; % è®¾å¸§é•¿ä¸º160   882â†’20msä¸€å¸§(fs=44100) 882*
 seg_move = 80;
 step = seglen - seg_move;
 n_segs = floor((n_samp-seg_move)/(seglen - seg_move))
@@ -345,7 +340,7 @@ if n_ears~=CF.n_ears
     error('bad number of input_waves channels passed to CARFAC_Run')
 end
 %----------------------------------------------------------------------------------
-%--------------------------------------°´Ö¡ÔËĞĞ------------------------------------
+%--------------------------------------æŒ‰å¸§è¿è¡Œ------------------------------------
 for seg_num = 1:n_segs
     if seg_num == n_segs
     % The last segement may be short of seglen, but do it anyway:
@@ -358,24 +353,24 @@ for seg_num = 1:n_segs
     win = hamming(size1);
     % [naps, CF, BM, seg_ohc, seg_agc] = CARFAC_Run_Segment(CF, input_waves, open_loop)
     %  [seg_naps, CF, seg_BM, seg_ohc, seg_agc] = CARFAC_Run_Segment(CF, test_signal(k_range, :), open_loop);
-    % test_signal(k_range, :)ÎªÃ¿Ò»Ö¡µÄÊı¾İ
+    % test_signal(k_range, :)ä¸ºæ¯ä¸€å¸§çš„æ•°æ®
     open_loop = 0;
-    % do_BM = 1;  ÒòÎªÒªÏÔÊ¾BMÍ¼£¬ËùÒÔdo_BMÁîÎª1
+    % do_BM = 1;  å› ä¸ºè¦æ˜¾ç¤ºBMå›¾ï¼Œæ‰€ä»¥do_BMä»¤ä¸º1
     input_waves = test_signal(k_range,:).*win;
-    [n_samp1,n_ears] = size(input_waves);  % ´ËÊ±n_sampÎªÃ¿Ò»Ö¡µÄ³¤¶È
+    [n_samp1,n_ears] = size(input_waves);  % æ­¤æ—¶n_sampä¸ºæ¯ä¸€å¸§çš„é•¿åº¦
     if n_ears ~= CF.n_ears
         error('bad number of input_waves channels passed to CARFAC_Run')
     end
     seg_naps = zeros(n_samp1, n_ch, n_ears); 
-    seg_BM = zeros(n_samp1, n_ch, n_ears);  % (ĞÅºÅ³¤¶È£¬71£¬n_ears)
+    seg_BM = zeros(n_samp1, n_ch, n_ears);  % (ä¿¡å·é•¿åº¦ï¼Œ71ï¼Œn_ears)
     seg_ohc = zeros(n_samp1, n_ch, n_ears);
     seg_agc = zeros(n_samp1, n_ch, n_ears);
     
     for k = 1:n_samp1
-  % at each time step, possibly handle multiple channels  ÔÚÃ¿¸öÊ±¼ä²½ÖèÖĞ£¬¿ÉÄÜ´¦Àí¶à¸öÍ¨µÀ
+  % at each time step, possibly handle multiple channels  åœ¨æ¯ä¸ªæ—¶é—´æ­¥éª¤ä¸­ï¼Œå¯èƒ½å¤„ç†å¤šä¸ªé€šé“
       for ear = 1:n_ears
    %--------------------------------------------------------------------------------------
-   %------------¸üĞÂCARµÄ×´Ì¬£¬car_outÊÇ·µ»ØP251ÖĞÍ¼17-1ÖĞDOHCµÄÊä³öY----------------------
+   %------------æ›´æ–°CARçš„çŠ¶æ€ï¼Œcar_outæ˜¯è¿”å›P251ä¸­å›¾17-1ä¸­DOHCçš„è¾“å‡ºY----------------------
         %  [car_out, CF.ears(ear).CAR_state] = CARFAC_CAR_Step( ...
         %   input_waves(k, ear), CF.ears(ear).CAR_coeffs, CF.ears(ear).CAR_state);
         g = CF.ears(ear).CAR_state.g_memory+CF.ears(ear).CAR_state.dg_memory;
@@ -383,86 +378,86 @@ for seg_num = 1:n_segs
         zA = CF.ears(ear).CAR_state.zA_memory;
         v = CF.ears(ear).CAR_state.z2_memory - zA;
         nlf = 1 ./ (1 + (v * CAR_coeffs.velocity_scale + CAR_coeffs.v_offset) .^ 2 ); % p254
-        r = CAR_coeffs.r1_coeffs + zB .* nlf; % p255Çó¼«µã°ë¾¶£¬´Ë´¦µÄr=r1+drz*NLF(»¹Î´³ËAGCµÄÊä³ö£¨1-b£©)
+        r = CAR_coeffs.r1_coeffs + zB .* nlf; % p255æ±‚æç‚¹åŠå¾„ï¼Œæ­¤å¤„çš„r=r1+drz*NLF(è¿˜æœªä¹˜AGCçš„è¾“å‡ºï¼ˆ1-bï¼‰)
         zA = CF.ears(ear).CAR_state.z2_memory;
-        z1 = r .* (CAR_coeffs.a0_coeffs .* ...  % z1 = z1 + inputs; Í¼17-1ÉÏÍ¨Â·
+        z1 = r .* (CAR_coeffs.a0_coeffs .* ...  % z1 = z1 + inputs; å›¾17-1ä¸Šé€šè·¯
         CF.ears(ear).CAR_state.z1_memory - CAR_coeffs.c0_coeffs .* CF.ears(ear).CAR_state.z2_memory);
-        z2 = r .* (CAR_coeffs.c0_coeffs .* ...  % Í¼17-1ÏÂÍ¨Â·
+        z2 = r .* (CAR_coeffs.c0_coeffs .* ...  % å›¾17-1ä¸‹é€šè·¯
         CF.ears(ear).CAR_state.z1_memory + CAR_coeffs.a0_coeffs .* CF.ears(ear).CAR_state.z2_memory);
-        zY = CAR_coeffs.h_coeffs .* z2;    % ²¿·ÖÊä³öhµÄÄÇÌõÍ¨Â·
+        zY = CAR_coeffs.h_coeffs .* z2;    % éƒ¨åˆ†è¾“å‡ºhçš„é‚£æ¡é€šè·¯
         in_out = input_waves(k,ear);
         for ch = 1:length(zY)
           z1(ch) = z1(ch) + in_out;
-          in_out = g(ch) * (in_out + zY(ch));  % P251Í¼17-1Êä³ö£ºY=g*(x+h)
+          in_out = g(ch) * (in_out + zY(ch));  % P251å›¾17-1è¾“å‡ºï¼šY=g*(x+h)
           zY(ch) = in_out;
         end
         CF.ears(ear).CAR_state.z1_memory = z1;
         CF.ears(ear).CAR_state.z2_memory = z2;
-        CF.ears(ear).CAR_state.zA_memory = zA;  % ±íÊ¾ÏÂÍ¨Â·µÄÊä³ö£¨ĞèÒª³ËhÊä³ö£©
+        CF.ears(ear).CAR_state.zA_memory = zA;  % è¡¨ç¤ºä¸‹é€šè·¯çš„è¾“å‡ºï¼ˆéœ€è¦ä¹˜hè¾“å‡ºï¼‰
         CF.ears(ear).CAR_state.zB_memory = zB;  % drz
         CF.ears(ear).CAR_state.zY_memory = zY;
         CF.ears(ear).CAR_state.g_memory = g;
         car_out = zY;
         
     %--------------------------------------------------------------------------------------
-    %------¸üĞÂIHCµÄ×´Ì¬£¬½«DOHCµÄÊä³öY×÷ÎªÊäÈë£¬ihc_outÊÇ·µ»ØP266ÖĞÍ¼P18-7ÖĞDIHCµÄÊä³öNAP----
+    %------æ›´æ–°IHCçš„çŠ¶æ€ï¼Œå°†DOHCçš„è¾“å‡ºYä½œä¸ºè¾“å…¥ï¼Œihc_outæ˜¯è¿”å›P266ä¸­å›¾P18-7ä¸­DIHCçš„è¾“å‡ºNAP----
         %   [ihc_out, CF.ears(ear).IHC_state] = CARFAC_IHC_Step( ...
         %   car_out, CF.ears(ear).IHC_coeffs, CF.ears(ear).IHC_state);
         ac_diff = car_out - CF.ears(ear).IHC_state.ac_coupler; 
         CF.ears(ear).IHC_state.ac_coupler = CF.ears(ear).IHC_state.ac_coupler + CF.ears(ear).IHC_coeffs.ac_coeff * ac_diff;
-        % conductance = CARFAC_Detect(ac_diff); P266°ë²¨ÕûÁ÷¡¢NLFÄ£¿é£¬conductanceÎªg
+        % conductance = CARFAC_Detect(ac_diff); P266åŠæ³¢æ•´æµã€NLFæ¨¡å—ï¼Œconductanceä¸ºg
         set = ac_diff > -a;
         zz = ac_diff(set)+a;
         conductance = zeros(size(ac_diff));
         conductance(set) = zz.^3 ./ (zz.^3 + zz.^2 + 0.1);
-        ihc_out = conductance .* CF.ears(ear).IHC_state.cap_voltage;  % p266Í¼18-7 y=g*v
+        ihc_out = conductance .* CF.ears(ear).IHC_state.cap_voltage;  % p266å›¾18-7 y=g*v
         CF.ears(ear).IHC_state.cap_voltage = CF.ears(ear).IHC_state.cap_voltage - ihc_out .* CF.ears(ear).IHC_coeffs.out_rate + ...
         (1 - CF.ears(ear).IHC_state.cap_voltage) .* CF.ears(ear).IHC_coeffs.in_rate;
         ihc_out = ihc_out * CF.ears(ear).IHC_coeffs.output_gain;
         
         CF.ears(ear).IHC_state.lpf1_state = CF.ears(ear).IHC_state.lpf1_state + CF.ears(ear).IHC_coeffs.lpf_coeff * ...
-        (ihc_out - CF.ears(ear).IHC_state.lpf1_state);  % Ê¹ÓÃµÚÒ»¸öË«¼«Æ½»¬ÂË²¨Æ÷½øĞĞÆ½»¬
+        (ihc_out - CF.ears(ear).IHC_state.lpf1_state);  % ä½¿ç”¨ç¬¬ä¸€ä¸ªåŒæå¹³æ»‘æ»¤æ³¢å™¨è¿›è¡Œå¹³æ»‘
     
         CF.ears(ear).IHC_state.lpf2_state = CF.ears(ear).IHC_state.lpf2_state + CF.ears(ear).IHC_coeffs.lpf_coeff * ...
-        (CF.ears(ear).IHC_state.lpf1_state - CF.ears(ear).IHC_state.lpf2_state); % Ê¹ÓÃµÚ¶ş¸öË«¼«Æ½»¬ÂË²¨Æ÷½øĞĞÆ½»¬
+        (CF.ears(ear).IHC_state.lpf1_state - CF.ears(ear).IHC_state.lpf2_state); % ä½¿ç”¨ç¬¬äºŒä¸ªåŒæå¹³æ»‘æ»¤æ³¢å™¨è¿›è¡Œå¹³æ»‘
     
-        ihc_out = CF.ears(ear).IHC_state.lpf2_state - CF.ears(ear).IHC_coeffs.rest_output;  % ×îÖÕµÃµ½Êä³öNAP
+        ihc_out = CF.ears(ear).IHC_state.lpf2_state - CF.ears(ear).IHC_coeffs.rest_output;  % æœ€ç»ˆå¾—åˆ°è¾“å‡ºNAP
         
         CF.ears(ear).IHC_state.ihc_accum = CF.ears(ear).IHC_state.ihc_accum + ihc_out;  % for where decimated output is useful
-        %  ¶ÔIHCÊä³ö½øĞĞÀÛ¼Ó£¬¶ÔÖ®ºóÆ½»¬Êä³öNAPÓĞÓÃ
+        %  å¯¹IHCè¾“å‡ºè¿›è¡Œç´¯åŠ ï¼Œå¯¹ä¹‹åå¹³æ»‘è¾“å‡ºNAPæœ‰ç”¨
         
     %----------------------------------------------------------------------------------------------------
-    %--------¸üĞÂAGCµÄ×´Ì¬²¢ÊµÏÖÍ¨µÀ¼äµÄñîºÏ£¬½«DIHCµÄÊä³öNAP×÷ÎªÊäÈë£¬·µ»ØµÄÊÇCF.ears(ear).AGC_state-------
-        % CF.ears(ear).AGC_stateÖĞµÄAGC_memory´æµÄÊÇP274Í¼19-6µÄÊä³ö
+    %--------æ›´æ–°AGCçš„çŠ¶æ€å¹¶å®ç°é€šé“é—´çš„è€¦åˆï¼Œå°†DIHCçš„è¾“å‡ºNAPä½œä¸ºè¾“å…¥ï¼Œè¿”å›çš„æ˜¯CF.ears(ear).AGC_state-------
+        % CF.ears(ear).AGC_stateä¸­çš„AGC_memoryå­˜çš„æ˜¯P274å›¾19-6çš„è¾“å‡º
         [CF.ears(ear).AGC_state, updated] = CARFAC_AGC_Step( ...
            ihc_out, CF.ears(ear).AGC_coeffs, CF.ears(ear).AGC_state);
        
         % save some output data:  
-        seg_naps(k, :, ear) = ihc_out;  % ±£´æDIHCµÄÊä³öNAPÊı¾İ£¨P266ÖĞÍ¼P18-7£©£º
-        % output to neural activity pattern Êä³öµ½Éñ¾­»î¶¯Ä£Ê½
-        % ¶¨ÒåµÄÊÇnaps = zeros(n_samp1, n_ch, n_ears);
+        seg_naps(k, :, ear) = ihc_out;  % ä¿å­˜DIHCçš„è¾“å‡ºNAPæ•°æ®ï¼ˆP266ä¸­å›¾P18-7ï¼‰ï¼š
+        % output to neural activity pattern è¾“å‡ºåˆ°ç¥ç»æ´»åŠ¨æ¨¡å¼
+        % å®šä¹‰çš„æ˜¯naps = zeros(n_samp1, n_ch, n_ears);
         
-        seg_BM(k, :, ear) = car_out;   %  ½«DOHCµÄÊä³öY´æÈëBMÖĞ£¨P251ÖĞÍ¼17-1£©
+        seg_BM(k, :, ear) = car_out;   %  å°†DOHCçš„è¾“å‡ºYå­˜å…¥BMä¸­ï¼ˆP251ä¸­å›¾17-1ï¼‰
         state = CF.ears(ear).CAR_state;  
-        seg_ohc(k, :, ear) = state.zA_memory; % ½«CAR_stateÖĞµÄzA_memory¸³Óèseg_ohc
-        seg_agc(k, :, ear) = state.zB_memory;% ½«CAR_stateÖĞµÄzB_memory¸³Óèseg_agc
-        % ¶¨ÒåµÄBM = zeros(n_samp1, n_ch, n_ears);  % (Ö¡³¤¶È£¬71£¬n_ears)
+        seg_ohc(k, :, ear) = state.zA_memory; % å°†CAR_stateä¸­çš„zA_memoryèµ‹äºˆseg_ohc
+        seg_agc(k, :, ear) = state.zB_memory;% å°†CAR_stateä¸­çš„zB_memoryèµ‹äºˆseg_agc
+        % å®šä¹‰çš„BM = zeros(n_samp1, n_ch, n_ears);  % (å¸§é•¿åº¦ï¼Œ71ï¼Œn_ears)
         % seg_ohc = zeros(n_samp1, n_ch, n_ears);
         % seg_agc = zeros(n_samp1, n_ch, n_ears);
      end % for ear = 1:n_ears
      
     %--------------------------------------------------------------------------------------
-    %----------------------------------ÊµÏÖË«¶ú¼äµÄñîºÏ-------------------------------------
-        if updated   % ÌÖÂÛÊÇ·ñÒªÓÃñîºÏ
-              % do multi-aural cross-coupling: ¶àÉùµÀ½»²æñîºÏ
-              % CF.ears = CARFAC_Cross_Couple(CF.ears); %CF.ears°üº¬ÁËIHC¡¢AGC¡¢CARµÄĞÅÏ¢
+    %----------------------------------å®ç°åŒè€³é—´çš„è€¦åˆ-------------------------------------
+        if updated   % è®¨è®ºæ˜¯å¦è¦ç”¨è€¦åˆ
+              % do multi-aural cross-coupling: å¤šå£°é“äº¤å‰è€¦åˆ
+              % CF.ears = CARFAC_Cross_Couple(CF.ears); %CF.earsåŒ…å«äº†IHCã€AGCã€CARçš„ä¿¡æ¯
               % n_stages = ears(1).AGC_coeffs(1).n_AGC_stages;
               % now cross-ear mix the stages that updated (leading stages at phase 0):
-              % ÏÖÔÚ½»²æ¶ú¶ä»ìºÏ¸üĞÂµÄ½×¶Î(ÔÚ0½×¿ªÊ¼)
+              % ç°åœ¨äº¤å‰è€³æœµæ··åˆæ›´æ–°çš„é˜¶æ®µ(åœ¨0é˜¶å¼€å§‹)
              n_stages=CF.ears(1).AGC_coeffs(1).n_AGC_stages;
              for stage = 1:n_stages
                 if CF.ears(1).AGC_state(stage).decim_phase > 0
-                  break  % ËùÓĞ×î½ü¸üĞÂµÄ½×¶ÎÒÑ¾­Íê³É
+                  break  % æ‰€æœ‰æœ€è¿‘æ›´æ–°çš„é˜¶æ®µå·²ç»å®Œæˆ
                 else
                   mix_coeff = CF.ears(1).AGC_coeffs(stage).AGC_mix_coeffs;
                   if mix_coeff > 0  % Typically stage 1 has 0 so no work on that one.
@@ -470,11 +465,11 @@ for seg_num = 1:n_segs
                     % sum up over the ears and get their mean:
                     for ear = 1:n_ears
                       stage_state = CF.ears(ear).AGC_state(stage).AGC_memory;
-                      % AGC_memory´æµÄÊÇP274Í¼19-5µÄÊä³ö£¬¶Ô4¸öÆ½»¬ÂË²¨Æ÷µÄÊä³öAGC_memory½øĞĞµş¼Ó
+                      % AGC_memoryå­˜çš„æ˜¯P274å›¾19-5çš„è¾“å‡ºï¼Œå¯¹4ä¸ªå¹³æ»‘æ»¤æ³¢å™¨çš„è¾“å‡ºAGC_memoryè¿›è¡Œå åŠ 
                       this_stage_sum = this_stage_sum + stage_state;
                     end
                     this_stage_mean = this_stage_sum / n_ears;
-                    % now move them all toward the mean: °ÑËüÃÇ¶¼ÒÆµ½¾ùÖµ£º
+                    % now move them all toward the mean: æŠŠå®ƒä»¬éƒ½ç§»åˆ°å‡å€¼ï¼š
                     for ear = 1:n_ears
                       stage_state = CF.ears(ear).AGC_state(stage).AGC_memory;
                       CF.ears(ear).AGC_state(stage).AGC_memory = ...
@@ -484,29 +479,29 @@ for seg_num = 1:n_segs
                 end
              end
     %-------------------------------------------------------------------------------------
-    %------------------------------¿¼ÂÇÊÇ·ñÌí¼ÓAGCµ¥ÔªÊµÏÖ---------------------------------
+    %------------------------------è€ƒè™‘æ˜¯å¦æ·»åŠ AGCå•å…ƒå®ç°---------------------------------
             if ~open_loop  % open_loop=0
               % CF = CARFAC_Close_AGC_Loop(CF);
-              % ½«AGCÊä³öb·´À¡¸øCARÒÔ¸üĞÂCARµÄ²ÎÊı£º
-              % ¸üĞÂÁËCF.ears(ear).CAR_state.dzB_memory  drz
-              % ¸üĞÂÁËCF.ears(ear).CAR_state.dg_memory
+              % å°†AGCè¾“å‡ºbåé¦ˆç»™CARä»¥æ›´æ–°CARçš„å‚æ•°ï¼š
+              % æ›´æ–°äº†CF.ears(ear).CAR_state.dzB_memory  drz
+              % æ›´æ–°äº†CF.ears(ear).CAR_state.dg_memory
               decim1 = CF.AGC_params.decimation(1);% decimation=[8,2,2,2]
-            % ½«AGCÊä³öb·´À¡¸øCARÒÔ¸üĞÂCARµÄ²ÎÊı
+            % å°†AGCè¾“å‡ºbåé¦ˆç»™CARä»¥æ›´æ–°CARçš„å‚æ•°
               for ear = 1:CF.n_ears
                   undamping = 1 - CF.ears(ear).AGC_state(1).AGC_memory; % stage 1 result
-                  %£¨1-b£©,b¼´ÎªAGCµÄÊä³öAGC_memory
+                  %ï¼ˆ1-bï¼‰,bå³ä¸ºAGCçš„è¾“å‡ºAGC_memory
                   % Update the target stage gain for the new damping:
-                  % ¸üĞÂÄ¿±ê¼¶ÔöÒæÎªĞÂµÄ
+                  % æ›´æ–°ç›®æ ‡çº§å¢ç›Šä¸ºæ–°çš„
                   new_r1 = CF.ears(ear).CAR_coeffs.r1_coeffs;  % at max damping
                   new_a0 = CF.ears(ear).CAR_coeffs.a0_coeffs;
                   new_c0 = CF.ears(ear).CAR_coeffs.c0_coeffs;
                   new_h  = CF.ears(ear).CAR_coeffs.h_coeffs;
-                  new_zr = CF.ears(ear).CAR_coeffs.zr_coeffs;  %drz Ïà¶Ô¸º×èÄá
+                  new_zr = CF.ears(ear).CAR_coeffs.zr_coeffs;  %drz ç›¸å¯¹è´Ÿé˜»å°¼
                   new_r  = r1 + zr .* undamping;  % r=r1+drz*(1-b)
                   new_g  = (1 - 2*new_r.*a0 + new_r.^2) ./ (1 - 2*new_r.*new_a0 + new_h.*new_r.*new_c0 + new_r.^2); 
-                  % ·µ»ØÔÚDC´¦»ñµÃµ¥Î»ÔöÒæËùĞèµÄ¼¶ÔöÒæg£¨¸ù¾İP246ÇógµÄ¹«Ê½µÃ³ö£¬ÏÔÊ¾Îªp251ÖĞµÄÔöÒæg£©
+                  % è¿”å›åœ¨DCå¤„è·å¾—å•ä½å¢ç›Šæ‰€éœ€çš„çº§å¢ç›Šgï¼ˆæ ¹æ®P246æ±‚gçš„å…¬å¼å¾—å‡ºï¼Œæ˜¾ç¤ºä¸ºp251ä¸­çš„å¢ç›Šgï¼‰
                   % set the deltas needed to get to the new damping:
-                  % ÉèÖÃĞÂµÄ×èÄáËùĞèµÄdelta(¦Ä)Öµ:
+                  % è®¾ç½®æ–°çš„é˜»å°¼æ‰€éœ€çš„delta(Î´)å€¼:
                   CF.ears(ear).CAR_state.dzB_memory = ...
                     (CF.ears(ear).CAR_coeffs.zr_coeffs .* undamping - ...
                     CF.ears(ear).CAR_state.zB_memory) / decim1;
@@ -518,20 +513,20 @@ for seg_num = 1:n_segs
     end  %for k=1:n_samp1
     
     %----------------------------------------------------------------------------
-    %------------------------------½«Ã¿Ö¡×éºÏÆğÀ´---------------------------------
+    %------------------------------å°†æ¯å¸§ç»„åˆèµ·æ¥---------------------------------
     for ear = 1:n_ears
       % Accumulate segment BM to make full BM
-      % ÀÛ»ıBM
-      BM(k_range, :, ear) = seg_BM(:, :, ear); % ÇóÓïÒôÈ«Ö¡µÄDOHC+CARÊä³ö
+      % ç´¯ç§¯BM
+      BM(k_range, :, ear) = seg_BM(:, :, ear); % æ±‚è¯­éŸ³å…¨å¸§çš„DOHC+CARè¾“å‡º
       ohc(k_range, :, ear) = seg_ohc(:, :, ear);
       nap(k_range, :, ear) = seg_naps(:, :, ear);
       agc(k_range, :, ear) = seg_agc(:, :, ear);
       decim_naps(seg_num, :, ear) = CF.ears(ear).IHC_state.ihc_accum / seglen;
-      CF.ears(ear).IHC_state.ihc_accum = zeros(n_ch,1); % ÓÃihcµÄÊä³öÀÛ¼Ó³ıÖ¡³¤
+      CF.ears(ear).IHC_state.ihc_accum = zeros(n_ch,1); % ç”¨ihcçš„è¾“å‡ºç´¯åŠ é™¤å¸§é•¿
     end 
     
-    %------------------------------½«Ã¿Ö¡×éºÏÆğÀ´--------------------------------
-    %------------------------ÏÔÊ¾AGCÖĞÃ¿¸öÆ½»¬ÂË²¨Æ÷µÄÊä³ö-----------------------
+    %------------------------------å°†æ¯å¸§ç»„åˆèµ·æ¥--------------------------------
+    %------------------------æ˜¾ç¤ºAGCä¸­æ¯ä¸ªå¹³æ»‘æ»¤æ³¢å™¨çš„è¾“å‡º-----------------------
 %     figure(1);     
 %     hold off;clf
 %     maxmax = 0;
@@ -539,11 +534,11 @@ for seg_num = 1:n_segs
 %       hold on
 %       for stage = 1:4;
 %         stage_response = 2^(stage-1) * CF.ears(ear).AGC_state(stage).AGC_memory;
-%         % ÏÔÊ¾Ã¿Ò»Ö¡¡¢Ã¿Ò»¼¶Æ½»¬ÂË²¨Æ÷AGCÊä³öµÄÔöÒæ³ËÉÏ¼ÓÈ¨Òò×Ó
+%         % æ˜¾ç¤ºæ¯ä¸€å¸§ã€æ¯ä¸€çº§å¹³æ»‘æ»¤æ³¢å™¨AGCè¾“å‡ºçš„å¢ç›Šä¹˜ä¸ŠåŠ æƒå› å­
 %         plot(stage_response);
-%         xlabel('Í¨µÀºÅ');
-%         ylabel('AGCÂË²¨Æ÷×´Ì¬¼°Êä³öb'); 
-%         title('AGCÂË²¨Æ÷µÄÊÊµ÷×´Ì¬');
+%         xlabel('é€šé“å·');
+%         ylabel('AGCæ»¤æ³¢å™¨çŠ¶æ€åŠè¾“å‡ºb'); 
+%         title('AGCæ»¤æ³¢å™¨çš„é€‚è°ƒçŠ¶æ€');
 %         maxmax = max(maxmax, max(stage_response));
 %       end
 %     end
@@ -551,23 +546,23 @@ for seg_num = 1:n_segs
 %     drawnow   
 end
 
-%------------------------ÏÔÊ¾IHCÊä³öµÄNAPÍ¼-----------------------
+%------------------------æ˜¾ç¤ºIHCè¾“å‡ºçš„NAPå›¾-----------------------
  for ear = 1:n_ears
     smooth_nap = decim_naps(:, :, ear);
     mono_max = max(smooth_nap(:));
     if ear==1
         smooth_nap1=63 * ((max(0, smooth_nap)/mono_max)' .^ 0.5);
         imagesc(smooth_nap1);
-        xlabel('Ê±¼äÑùµãÊı');
-        ylabel('CARFACÍ¨µÀÊı'); 
-        title('Ë«¶úÆ½»¬NAPÍ¼');
+        xlabel('æ—¶é—´æ ·ç‚¹æ•°');
+        ylabel('CARFACé€šé“æ•°'); 
+        title('åŒè€³å¹³æ»‘NAPå›¾');
     end
 %     else
 %         smooth_nap2=63 * ((max(0, smooth_nap)/mono_max)' .^ 0.5);
 %         imagesc(smooth_nap2);
-%         xlabel('Ê±¼äÑùµãÊı');
-%         ylabel('CARFACÍ¨µÀÊı'); 
-%         title('Ë«¶úÆ½»¬NAPÍ¼');
+%         xlabel('æ—¶é—´æ ·ç‚¹æ•°');
+%         ylabel('CARFACé€šé“æ•°'); 
+%         title('åŒè€³å¹³æ»‘NAPå›¾');
 %     end
 %     if ear==1
 %         save('C:\Users\PitayaFan\Desktop\nap_seg.txt','smooth_nap1','-ascii');
@@ -583,24 +578,24 @@ end
 %         figure(3+ear);
 %         nap1=naps';
 %         imagesc(nap1);
-%         xlabel('Ê±¼äÑùµãÊı');
-%         ylabel('CARFACÍ¨µÀÊı'); 
-%         title('Î´Æ½»¬NAPÍ¼');
+%         xlabel('æ—¶é—´æ ·ç‚¹æ•°');
+%         ylabel('CARFACé€šé“æ•°'); 
+%         title('æœªå¹³æ»‘NAPå›¾');
 %     else
 %         figure(3+ear);
 %         nap2=naps';
 %         imagesc(nap2);
-%         xlabel('Ê±¼äÑùµãÊı');
-%         ylabel('CARFACÍ¨µÀÊı'); 
-%         title('Ë«¶úÎ´Æ½»¬NAPÍ¼');
+%         xlabel('æ—¶é—´æ ·ç‚¹æ•°');
+%         ylabel('CARFACé€šé“æ•°'); 
+%         title('åŒè€³æœªå¹³æ»‘NAPå›¾');
 %     end
 %  end
 %     figure(5+ear);
 %     image(naps(10700:11000,:)'*10);
 %     colormap(cmap);
-%     xlabel('Ê±¼äÑùµãÊı');
-%     ylabel('CARFACÍ¨µÀÊı'); 
-%     title('Ë«¶úÎ´Æ½»¬NAPÍ¼(Æ¬¶Î)');
+%     xlabel('æ—¶é—´æ ·ç‚¹æ•°');
+%     ylabel('CARFACé€šé“æ•°'); 
+%     title('åŒè€³æœªå¹³æ»‘NAPå›¾(ç‰‡æ®µ)');
 %    naps_seg=naps(20000:20800,:);
 %     if ear==1
 %         save('C:\Users\Administrator\Desktop\nap2.txt','naps_seg','-ascii');
